@@ -19,19 +19,50 @@ public class UserController {
 
     @PostMapping("/addUser")
     public ResponseEntity<?> userRegistration(@RequestBody User user) {
-        User savedUser = userServices.addUser(user);
-        return new ResponseEntity<>(savedUser,HttpStatus.CREATED);
+        try {
+            User savedUser = userServices.addUser(user);
+            return new ResponseEntity<>(savedUser,HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/getAllUsers")
     public ResponseEntity<?> getAllUser() {
-        List<User> users = userServices.getAllUser();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        try {
+            List<User> users = userServices.getAllUser();
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/getUserById/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable Long userId) {
-        Optional<User> user = userServices.getUserById(userId);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        try {
+            Optional<User> user = userServices.getUserById(userId);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
+
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<?> deleteUserById(@PathVariable Long userId) {
+        try {
+            userServices.deleteUserById(userId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }
