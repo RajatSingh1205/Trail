@@ -2,12 +2,14 @@ package com.example.Trail.controller;
 
 import com.example.Trail.entity.Movie;
 import com.example.Trail.services.MovieServices;
+import com.fasterxml.jackson.annotation.OptBoolean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/movies")
@@ -22,9 +24,9 @@ public class MovieController {
             Movie saveMovie = movieServices.addMovies(movie);
             return new ResponseEntity<>(saveMovie, HttpStatus.CREATED);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -33,6 +35,29 @@ public class MovieController {
         try {
             List<Movie> movies = movieServices.getAllMovies();
             return new ResponseEntity<>(movies, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/getMovieById/{movieId}")
+    public ResponseEntity<?> getMoviesById(@PathVariable Long movieId) {
+        try {
+            Optional<Movie> movie = movieServices.getMovieById(movieId);
+            return new ResponseEntity<>(movie, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/getMovieByName/{movieName}")
+    public ResponseEntity<?> getMovieByName(@PathVariable String movieName) {
+        try {
+            Optional<Movie> movie = movieServices.getMovieByName(movieName);
+            return new ResponseEntity<>(movie, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
