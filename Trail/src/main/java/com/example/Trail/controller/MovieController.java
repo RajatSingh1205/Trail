@@ -1,6 +1,8 @@
 package com.example.Trail.controller;
 
+import com.example.Trail.DTO.MovieDetailsResponse;
 import com.example.Trail.DTO.TmdbSearchResponse;
+import com.example.Trail.DTO.TopRatedResponse;
 import com.example.Trail.entity.Movie;
 import com.example.Trail.services.MovieServices;
 import com.example.Trail.services.TmdbServices;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -23,6 +26,18 @@ public class MovieController {
     @Autowired
     private TmdbServices tmdbService;
 
+    @GetMapping("/details")
+    public ResponseEntity<?> movieDetails(@RequestParam Long movieId) {
+        try {
+            MovieDetailsResponse movieDetails = tmdbService.getMovieDetails(movieId);
+            return new ResponseEntity<>(movieDetails, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST); 
+        }
+    }
+
     @GetMapping("/search")
     public ResponseEntity<?> search(@RequestParam String query) {
         try {
@@ -30,6 +45,18 @@ public class MovieController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/top-rated")
+    public ResponseEntity<?> topRatedMovies(@RequestParam(defaultValue = "1") int page) {
+        try {
+            TopRatedResponse response = tmdbService.getTopRatedMovies(page);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
