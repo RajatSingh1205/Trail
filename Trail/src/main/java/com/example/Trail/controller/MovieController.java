@@ -1,19 +1,17 @@
 package com.example.Trail.controller;
 
-import com.example.Trail.DTO.MovieDetailsResponse;
-import com.example.Trail.DTO.TmdbSearchResponse;
-import com.example.Trail.DTO.TopRatedResponse;
+import com.example.Trail.DTO.response.MovieDetailsResponse;
+import com.example.Trail.DTO.tmdb.TmdbSearchResponse;
+import com.example.Trail.DTO.response.PagedMovieResponse;
 import com.example.Trail.entity.Movie;
 import com.example.Trail.services.MovieServices;
 import com.example.Trail.services.TmdbServices;
-import com.fasterxml.jackson.annotation.OptBoolean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -25,6 +23,32 @@ public class MovieController {
 
     @Autowired
     private TmdbServices tmdbService;
+
+    @GetMapping("/popular")
+    public ResponseEntity<?> popularMovies(@RequestParam(defaultValue = "1") int page ) {
+        try {
+            PagedMovieResponse response = tmdbService.getPopularMovies(page);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    @GetMapping("upcoming")
+    public ResponseEntity<?> upComingMovies(@RequestParam(defaultValue = "1") int page ) {
+        try {
+            PagedMovieResponse response = tmdbService.getUpComingMovies(page);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+    }
 
     @GetMapping("/details")
     public ResponseEntity<?> movieDetails(@RequestParam Long movieId) {
@@ -53,7 +77,7 @@ public class MovieController {
     @GetMapping("/top-rated")
     public ResponseEntity<?> topRatedMovies(@RequestParam(defaultValue = "1") int page) {
         try {
-            TopRatedResponse response = tmdbService.getTopRatedMovies(page);
+            PagedMovieResponse response = tmdbService.getTopRatedMovies(page);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,5 +1,6 @@
-package com.example.Trail.DTO;
+package com.example.Trail.DTO.response;
 
+import com.example.Trail.DTO.tmdb.CastResult;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,5 +17,5 @@ public class MovieDetailsResponse {
     private String posterPath;
 
     private List<TrailerDto> trailers;
-    private List<CastDto> cast;
+    private List<CastResult> cast;
 }

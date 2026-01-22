@@ -1,4 +1,4 @@
-package com.example.Trail.DTO;
+package com.example.Trail.DTO.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

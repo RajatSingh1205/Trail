@@ -1,6 +1,13 @@
 package com.example.Trail.services;
 
-import com.example.Trail.DTO.*;
+import com.example.Trail.DTO.response.MovieCardResponse;
+import com.example.Trail.DTO.response.MovieDetailsResponse;
+import com.example.Trail.DTO.response.PagedMovieResponse;
+import com.example.Trail.DTO.response.TrailerDto;
+import com.example.Trail.DTO.tmdb.CastResult;
+import com.example.Trail.DTO.tmdb.TmdbMovieDetailsDto;
+import com.example.Trail.DTO.tmdb.TmdbSearchResponse;
+import com.example.Trail.mapper.MovieMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -66,11 +73,11 @@ public class TmdbServices {
                         .toList();
 
 
-        List<CastDto> cast =
+        List<CastResult> cast =
                 tmdbResponse.getCredits().getCast()
                         .stream()
                         .limit(10)
-                        .map(c -> new CastDto(
+                        .map(c -> new CastResult(
                                 c.getName(),
                                 c.getCharacter()
                         ))
@@ -89,7 +96,7 @@ public class TmdbServices {
                 .build();
     }
 
-    public TopRatedResponse getTopRatedMovies(int page) {
+    public PagedMovieResponse getTopRatedMovies(int page) {
         TmdbSearchResponse tmdbResponse =  webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/movie/top_rated")
@@ -104,16 +111,62 @@ public class TmdbServices {
         List<MovieCardResponse> movies =
                 tmdbResponse.getResults()
                         .stream()
-                        .map(movie -> new MovieCardResponse(
-                                (long) movie.getId(),
-                                movie.getTitle(),
-                                movie.getPosterPath(),
-                                movie.getVoteAverage(),
-                                movie.getReleaseDate()
-                        ))
+                        .map(MovieMapper::toCard)
                         .toList();
 
-        return TopRatedResponse.builder()
+        return PagedMovieResponse.builder()
+                .page(tmdbResponse.getPage())
+                .totalPages(tmdbResponse.getTotalPages())
+                .movies(movies)
+                .build();
+    }
+
+    public PagedMovieResponse getUpComingMovies(int page) {
+        TmdbSearchResponse tmdbResponse =
+                webClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/movie/upcoming")
+                                .queryParam("api_key", apiKey)
+                                .queryParam("language", "en-US")
+                                .queryParam("page", page)
+                                .build())
+                        .retrieve()
+                        .bodyToMono(TmdbSearchResponse.class)
+                        .block();
+
+        List<MovieCardResponse> movies =
+                tmdbResponse.getResults()
+                        .stream()
+                        .map(MovieMapper::toCard)
+                        .toList();
+
+        return PagedMovieResponse.builder()
+                .page(tmdbResponse.getPage())
+                .totalPages(tmdbResponse.getTotalPages())
+                .movies(movies)
+                .build();
+    }
+
+    public PagedMovieResponse getPopularMovies(int page) {
+        TmdbSearchResponse tmdbResponse =
+                webClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/movie/popular")
+                                .queryParam("api_key", apiKey)
+                                .queryParam("language", "en-US")
+                                .queryParam("page", page)
+                                .build())
+                        .retrieve()
+                        .bodyToMono(TmdbSearchResponse.class)
+                        .block();
+
+        List<MovieCardResponse> movies =
+                tmdbResponse.getResults()
+                        .stream()
+                        .map(MovieMapper::toCard)
+                        .toList();
+
+        return PagedMovieResponse.builder()
                 .page(tmdbResponse.getPage())
                 .totalPages(tmdbResponse.getTotalPages())
                 .movies(movies)

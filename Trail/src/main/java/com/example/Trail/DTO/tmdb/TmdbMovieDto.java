@@ -1,4 +1,4 @@
-package com.example.Trail.DTO;
+package com.example.Trail.DTO.tmdb;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
