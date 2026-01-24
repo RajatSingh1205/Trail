@@ -34,7 +34,18 @@ public class MovieController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
 
+    @GetMapping("/now_playing")
+    public ResponseEntity<?> nowPlayingMovies(@RequestParam(defaultValue = "1") int page ) {
+        try {
+            PagedMovieResponse response = tmdbService.getNowPlayingMovies(page);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("upcoming")

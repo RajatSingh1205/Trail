@@ -172,4 +172,30 @@ public class TmdbServices {
                 .movies(movies)
                 .build();
     }
+
+    public PagedMovieResponse getNowPlayingMovies(int page) {
+        TmdbSearchResponse tmdbResponse =
+                webClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/movie/now_playing")
+                                .queryParam("api_key", apiKey)
+                                .queryParam("language", "en-US")
+                                .queryParam("page", page)
+                                .build())
+                        .retrieve()
+                        .bodyToMono(TmdbSearchResponse.class)
+                        .block();
+
+        List<MovieCardResponse> movies =
+                tmdbResponse.getResults()
+                        .stream()
+                        .map(MovieMapper::toCard)
+                        .toList();
+
+        return PagedMovieResponse.builder()
+                .page(tmdbResponse.getPage())
+                .totalPages(tmdbResponse.getTotalPages())
+                .movies(movies)
+                .build();
+    }
 }
