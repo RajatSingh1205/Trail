@@ -6,4 +6,5 @@ import java.util.List;
 @Data
 public class Credits {
     private List<CastResult> cast;
+    private List<CrewResult> crew;
 }

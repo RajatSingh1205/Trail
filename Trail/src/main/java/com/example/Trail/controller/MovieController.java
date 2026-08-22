@@ -1,5 +1,4 @@
 package com.example.Trail.controller;
-
 import com.example.Trail.DTO.response.MovieDetailsResponse;
 import com.example.Trail.DTO.tmdb.TmdbSearchResponse;
 import com.example.Trail.DTO.response.PagedMovieResponse;
@@ -10,10 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/movies")
 public class MovieController {
@@ -23,10 +23,10 @@ public class MovieController {
 
     @Autowired
     private TmdbServices tmdbService;
-
+    
     @GetMapping("/popular")
     public ResponseEntity<?> popularMovies(@RequestParam(defaultValue = "1") int page ) {
-        try {
+	    try {
             PagedMovieResponse response = tmdbService.getPopularMovies(page);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (RuntimeException e) {
@@ -58,7 +58,6 @@ public class MovieController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @GetMapping("/details")

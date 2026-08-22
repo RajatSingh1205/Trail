@@ -4,14 +4,13 @@ import com.example.Trail.DTO.response.MovieCardResponse;
 import com.example.Trail.DTO.response.MovieDetailsResponse;
 import com.example.Trail.DTO.response.PagedMovieResponse;
 import com.example.Trail.DTO.response.TrailerDto;
-import com.example.Trail.DTO.tmdb.CastResult;
-import com.example.Trail.DTO.tmdb.TmdbMovieDetailsDto;
-import com.example.Trail.DTO.tmdb.TmdbSearchResponse;
+import com.example.Trail.DTO.tmdb.*;
 import com.example.Trail.mapper.MovieMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.awt.geom.GeneralPath;
 import java.util.List;
 
 @Service
@@ -76,12 +75,27 @@ public class TmdbServices {
         List<CastResult> cast =
                 tmdbResponse.getCredits().getCast()
                         .stream()
-                        .limit(10)
                         .map(c -> new CastResult(
                                 c.getName(),
-                                c.getCharacter()
+                                c.getCharacter(),
+                                c.getProfilePath()
                         ))
                         .toList();
+
+        List<CrewResult> crew =
+                tmdbResponse.getCredits().getCrew()
+                        .stream()
+                        .map(g -> new CrewResult(
+                                g.getName(),
+                                g.getProfilePath(),
+                                g.getDepartment()
+                        ))
+                        .toList();
+
+        List<String> genres = tmdbResponse.getGenres()
+                .stream()
+                .map(Genre::getName)
+                .toList();
 
 
         return MovieDetailsResponse.builder()
@@ -91,8 +105,14 @@ public class TmdbServices {
                 .releaseDate(tmdbResponse.getReleaseDate())
                 .rating(tmdbResponse.getVoteAverage())
                 .posterPath(tmdbResponse.getPosterPath())
+                .backdropPath(tmdbResponse.getBackdropPath())
                 .trailers(trailers)
+                .adult(tmdbResponse.isAdult())
                 .cast(cast)
+                .crew(crew)
+                .originalLanguage(tmdbResponse.getOriginalLanguage())
+                .runtime(tmdbResponse.getRuntime())
+                .genres(genres)
                 .build();
     }
 
