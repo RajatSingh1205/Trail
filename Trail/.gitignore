@@ -6,7 +6,7 @@ target/
 
 
 ### STS ###
-.idea
+.idea/
 .apt_generated
 .classpath
 .factorypath
